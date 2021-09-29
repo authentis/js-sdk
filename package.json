@@ -1,6 +1,6 @@
 {
   "name": "@authentis/js-sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Authentis javascript client.",
   "exports": {
     "import": "dist/authentis.es.js",
@@ -17,7 +17,6 @@
   },
   "author": "Murat Gözel <murat@gozel.com.tr>",
   "license": "BSD-2-Clause",
-  "private": true,
   "bugs": {
     "url": "https://github.com/authentis/js-sdk/issues"
   },
