@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Authentis JS SDK Test</title>
+  </head>
+  <body>
+    <script type="text/javascript" src="../dist/authentis.iife.js"></script>
+    <script type="text/javascript">
+      const token = 'eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..8AiUvTgwdNIJSklJ.9ENKXbZ5WiJrhpMPWNbZ_S1RXfDh-6yq1b-GBoRXX_5Jw3JMoV39AG58l7CV6HktSTDmEK2sozqpP6NmcY_T-w1yrj7JAyzDq9KnBVurBdzLsOitHCT1p-Q1e6zifXFx2WRS-jioz_LDocjjE_uypy_dPpXp5lWsjCkcw6ArIpOqmQanEe7zkuwxlR3qFXRcK6XXCIAIM1WCj-JQOY_4oNLYyMswUOLXiPowlhirQapyrM1jaIFEyqwuJCRwPu9AVJgx-gOEQ2VqLqXPlal_sEnJRL2Kxu_5LgM7sDw.2f9m2UrXeMyg_da0JqqhkQ'
+      const client = Authentis.configure({version: 'v2021.09.28', token: token})
+      client.captcha.handshake({data: 'someRandomData12345'})
+        .then(function(data) {
+          console.log('captcha handshake:', data)
+
+          client.organization.get('ff31b736-5c39-4b5b-81c6-d898183ba879')
+            .then(function(org) {
+              console.log(org)
+            })
+        })
+    </script>
+  </body>
+</html>
