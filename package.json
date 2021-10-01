@@ -1,10 +1,10 @@
 {
   "name": "@authentis/js-sdk",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Authentis javascript client.",
   "exports": {
-    "import": "dist/authentis.es.js",
-    "require": "dist/authentis.cjs.js"
+    "import": "./dist/authentis.es.js",
+    "require": "./dist/authentis.cjs.js"
   },
   "main": "dist/authentis.cjs.js",
   "scripts": {
