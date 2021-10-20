@@ -1,15 +1,22 @@
 {
   "name": "@authentis/js-sdk",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Authentis javascript client.",
   "exports": {
-    "import": "./dist/authentis.es.js",
-    "require": "./dist/authentis.cjs.js"
+    ".": "./src/index.js",
+    "./browser/es": "./dist/browser/es/index.js",
+    "./browser/cjs": "./dist/browser/cjs/index.js",
+    "./browser/iife": "./dist/browser/iife/index.js",
+    "./node/es": "./dist/node/es/index.js",
+    "./node/cjs": "./dist/node/cjs/index.js"
   },
-  "main": "dist/authentis.cjs.js",
+  "main": "dist/node/cjs/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rollup --config rollup.config.js"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "type": "git",
@@ -26,17 +33,16 @@
     "@babel/core": "^7.15.5",
     "@babel/plugin-transform-runtime": "^7.15.0",
     "@babel/preset-env": "^7.15.6",
+    "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^20.0.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.0.5",
-    "core-js": "^3.18.1",
+    "core-js": "^3.18.3",
     "rollup": "^2.57.0",
-    "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-terser": "^7.0.2"
   },
   "dependencies": {
     "@babel/runtime": "^7.15.4",
-    "promise-polyfill": "^8.2.0",
-    "whatwg-fetch": "^3.6.2"
+    "@babel/runtime-corejs3": "^7.15.4"
   }
 }

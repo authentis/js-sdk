@@ -1,49 +1,61 @@
 import http from 'https'
 import authentis from '../client'
-import pkg from '../../package.json'
 
+/*
 function getUserAgent() {
   return 'Authentis/SDK/' + pkg.version + ' Node.js/' + process.versions.node
 }
-
+*/
 function createRequest(params) {
   const self = this
   const mayHaveBody = ['POST', 'PUT'].indexOf(params.method) !== -1
   const requestOpts = {
     method: params.method,
-    hostname: self.config.host
+    headers: self.createHeaders.call(self, params)
   }
 
-  const contentTypeHeader = mayHaveBody ? {'Content-Type': 'application/json'} : {}
-  const authHeader = self.config.token ? {'Authorization': 'Bearer ' + self.config.token} : {}
-  const initialHeaders = Object.assign({}, {
-    'Accept': 'application/json',
-    'Cache-Control': 'no-cache',
-    'Pragma': 'no-cache',
-    'User-Agent': getUserAgent()
-  }, contentTypeHeader, authHeader)
-  const headers = Object.assign({}, initialHeaders, params.headers || {})
-  requestOpts.headers = headers
-
-  return async function req(arg1, arg2) {
+  return async function req(opts={}) {
     return new Promise(function(resolve, reject) {
-      const pathSuffix = !mayHaveBody && arg1 ? '/' + arg1 : mayHaveBody && arg2 ? '/' + arg1 : ''
-      const payload = arg2 ? arg2 : arg1 && mayHaveBody ? arg1 : null
-      const body = payload ? JSON.stringify(payload) : null
+      let body = null
+      const url = new URL(params.path, self.config.host)
 
-      requestOpts.path = params.path + pathSuffix
+      if (opts.path && Array.isArray(opts.path)) {
+        url.pathname += '/' + opts.path.join('/')
+      }
 
-      if (mayHaveBody && payload) {
+      if (opts.searchParams) {
+        Object.keys(opts.searchParams).map(param => url.searchParams.set(param, opts.searchParams[param]))
+      }
+
+      if (opts.id) {
+        if (/[^a-zA-Z0-9-]+/.test(opts.id)) {
+          return {error: {code: 'REQUEST_ERROR', details: 'Invalid identifier.'}}
+        }
+        url.pathname = params.path + '/' + opts.id
+      }
+
+      if (opts.body) {
+        if (Object.prototype.toString.call(opts.body) === '[object Object]') {
+          body = JSON.stringify(opts.body)
+        }
+        else {
+          body = opts.body
+        }
+
         requestOpts.headers['Content-Length'] = Buffer.byteLength(body, 'utf8')
       }
 
-      const request = http.request(requestOpts)
+      const request = http.request(url, requestOpts)
 
       request.on('socket', function(socket) {
         socket.setTimeout(5000)
         socket.on('timeout', function() {
           request.abort()
         })
+      })
+
+      request.on('abort', function(e) {
+        return resolve({error: {code: 'REQUEST_ABORTED'}})
       })
 
       request.on('error', function(e) {

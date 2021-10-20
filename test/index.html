@@ -5,19 +5,72 @@
     <title>Authentis JS SDK Test</title>
   </head>
   <body>
-    <script type="text/javascript" src="../dist/authentis.iife.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/cuid@2.1.8/dist/cuid.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/js-sha3@0.8.0/src/sha3.min.js"></script>
+    <script type="text/javascript" src="../dist/browser/iife/index.js"></script>
     <script type="text/javascript">
-      const token = 'eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..8AiUvTgwdNIJSklJ.9ENKXbZ5WiJrhpMPWNbZ_S1RXfDh-6yq1b-GBoRXX_5Jw3JMoV39AG58l7CV6HktSTDmEK2sozqpP6NmcY_T-w1yrj7JAyzDq9KnBVurBdzLsOitHCT1p-Q1e6zifXFx2WRS-jioz_LDocjjE_uypy_dPpXp5lWsjCkcw6ArIpOqmQanEe7zkuwxlR3qFXRcK6XXCIAIM1WCj-JQOY_4oNLYyMswUOLXiPowlhirQapyrM1jaIFEyqwuJCRwPu9AVJgx-gOEQ2VqLqXPlal_sEnJRL2Kxu_5LgM7sDw.2f9m2UrXeMyg_da0JqqhkQ'
-      const client = Authentis.configure({version: 'v2021.09.28', token: token})
-      client.captcha.handshake({data: 'someRandomData12345'})
-        .then(function(data) {
-          console.log('captcha handshake:', data)
+      function generateProofOfWork(token, difficulty) {
+        function parseHexString(hex) {
+          const bytes = [];
+          for (let c = 0; c < hex.length; c += 2) {
+            bytes.push( parseInt(hex.substr(c, 2), 16) )
+          }
+          return bytes
+        }
 
-          client.organization.get('ff31b736-5c39-4b5b-81c6-d898183ba879')
-            .then(function(org) {
-              console.log(org)
-            })
+        function sum(acc, cur) {
+          return acc + cur
+        }
+
+        let nonce = 0, hash = null
+        while (++nonce) {
+          hash = parseHexString( sha3_512(token + nonce) )
+
+          if (hash.slice(0, difficulty).reduce(sum, 0) === 0) {
+            break
+          }
+        }
+
+        return nonce.toString()
+      }
+
+      const token = 'eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..ppg4b0ZwKYBaH6NK.1ochH6KrlqxNcIMEdAh7U_7tzsfRju6AIsBCG3gbyqUeFU4vBhMp0SsyIQAM2wsFumxS7Jh1mXhV5VreNrkd4lUpnxE6_HhD7ZEqiVgbPxPeTURQB0yrC6Hq3GGOV7WEl3-WeP3RRKP_TRhX4avkLO-x8GqLq_1SN71Az3EdlTValqS6EVvNgS_C_s6u2UMfafvreTsEnwlJqB-xQI1yyoIg6kKRlIQEBPncW2th9llEPfquOPRHKCvtWOCpYHdkAMayaqZmoi0Ztk-9.1Pq8D6DeMjg3_vLNjNaQtg'
+      const client = Authentis.configure({
+        host: 'http://127.0.0.1:3000',
+        projectIdentifier: '80753b14-2150-4e55-9ade-1826356034f2',
+        token: token
+      })
+      const nonce = cuid()
+      const nonce2 = cuid()
+
+      client.captcha.handshake({body: {nonce: nonce}}).then(function(data) {
+        console.log('captcha handshake:', data)
+
+        client.captcha.verify({body: {nonce: nonce, proof: generateProofOfWork(data.hash, 2)}}).then(function(data2) {
+          console.log('captcha verify:', data2)
         })
+      })
+
+      client.auth.state().then(function(data3) {
+        console.log('auth state:',data3)
+
+        client.auth.session({body: {nonce: nonce2}}).then(function(data4) {
+          console.log('auth session:',data4)
+
+          client.auth.epwd({body: {email: 'murat@gozel.com.tr', password: 'murat77415', state: data4.state, proof: generateProofOfWork(data4.pow_hash, 2)}}).then(function(data5) {
+            console.log('signin with epwd:', data5)
+
+          })
+        })
+      })
+
+      client.project.signinMethod.get({path: ['ea6f20c0-f906-4b47-b791-d613253b6370']}).then(function(data6) {
+        console.log('project signin method:', data6)
+      })
+
+      client.device.inspect().then(function(data7) {
+        console.log('device inspect:', data7)
+      })
     </script>
   </body>
 </html>

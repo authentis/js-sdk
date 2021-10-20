@@ -4,30 +4,50 @@ function captcha() {
       method: 'PUT',
       path: '/captcha'
     }),
-    check: this.createRequest.call(this, {
+    verify: this.createRequest.call(this, {
       method: 'POST',
       path: '/captcha'
     })
   }
 }
 
-function signin() {
+function auth() {
   return {
-    request: this.createRequest.call(this, {
-      method: 'POST',
-      path: '/signin'
-    }),
-    verify: this.createRequest.call(this, {
-      method: 'PUT',
-      path: '/signin'
-    }),
     state: this.createRequest.call(this, {
       method: 'GET',
-      path: '/signin'
+      path: '/auth/state'
+    }),
+    session: this.createRequest.call(this, {
+      method: 'POST',
+      path: '/auth/session'
+    }),
+    epwd: this.createRequest.call(this, {
+      method: 'POST',
+      path: '/auth/signin/epwd'
+    }),
+    epwdv: this.createRequest.call(this, {
+      method: 'PUT',
+      path: '/auth/signin/epwd'
+    }),
+    eotp: this.createRequest.call(this, {
+      method: 'POST',
+      path: '/auth/signin/eotp'
+    }),
+    eotpv: this.createRequest.call(this, {
+      method: 'PUT',
+      path: '/auth/signin/eotp'
+    }),
+    potp: this.createRequest.call(this, {
+      method: 'POST',
+      path: '/auth/signin/potp'
+    }),
+    potpv: this.createRequest.call(this, {
+      method: 'PUT',
+      path: '/auth/signin/potp'
     }),
     revoke: this.createRequest.call(this, {
       method: 'DELETE',
-      path: '/signin'
+      path: '/auth/revoke'
     })
   }
 }
@@ -70,27 +90,45 @@ function project() {
     remove: this.createRequest.call(this, {
       method: 'DELETE',
       path: '/project'
-    })
+    }),
+    signinMethod: {
+      create: this.createRequest.call(this, {
+        method: 'POST',
+        path: '/project/signin-method'
+      }),
+      update: this.createRequest.call(this, {
+        method: 'PUT',
+        path: '/project/signin-method'
+      }),
+      get: this.createRequest.call(this, {
+        method: 'GET',
+        path: '/project/signin-method'
+      }),
+      remove: this.createRequest.call(this, {
+        method: 'DELETE',
+        path: '/project/signin-method'
+      })
+    }
   }
 }
 
-function messageTemplate() {
+function app() {
   return {
     create: this.createRequest.call(this, {
       method: 'POST',
-      path: '/message-template'
+      path: '/app'
     }),
     update: this.createRequest.call(this, {
       method: 'PUT',
-      path: '/message-template'
+      path: '/app'
     }),
     get: this.createRequest.call(this, {
       method: 'GET',
-      path: '/message-template'
+      path: '/app'
     }),
     remove: this.createRequest.call(this, {
       method: 'DELETE',
-      path: '/message-template'
+      path: '/app'
     })
   }
 }
@@ -112,12 +150,26 @@ function invitation() {
   }
 }
 
+function device() {
+  return {
+    inspect: this.createRequest.call(this, {
+      method: 'PUT',
+      path: '/device'
+    })
+  }
+}
+
 export default function Authentis(userConfig) {
   this.config = {
     host: userConfig.host || 'https://auth.gozel.com.tr',
+    version: userConfig.version || null,
+    projectIdentifier: userConfig.projectIdentifier || '',
+    projectLocale: userConfig.locale || '',
     token: userConfig.token || null,
-    version: userConfig.version || null
+    clientId: userConfig.clientId || null,
+    clientSecret: userConfig.clientSecret || null
   }
+
   this.setLastResponse = function(resp) {
     this.lastResponse = resp
   }
@@ -125,13 +177,45 @@ export default function Authentis(userConfig) {
     return this.lastResponse
   }
 
+  this.createAuthHeader = function createAuthHeader(obj) {
+    if (obj.token) {
+      return 'Bearer ' + obj.token
+    }
+    else if (obj.clientId && obj.clientSecret) {
+      return 'Basic ' + btoa(obj.clientId + ':' + obj.clientSecret)
+    }
+    else {
+      return ''
+    }
+  }
+
+  this.createHeaders = function createHeaders(obj) {
+    return Object.assign({},
+      {
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+      },
+      ['POST', 'PUT'].indexOf(obj.method) !== -1
+        ? {'Content-Type': 'application/json'}
+        : {},
+      {'Authorization': this.createAuthHeader(this.config)},
+      this.config.projectIdentifier
+        ? {'Authentis-Project-Identifier': this.config.projectIdentifier}
+        : {},
+      this.config.projectLocale
+        ? {'Authentis-Project-Locale': this.config.projectLocale}
+        : {}
+    )
+  }
+
   return {
     getLastResponse: this.getLastResponse.bind(this),
     captcha: captcha.apply(this),
-    signin: signin.apply(this),
+    auth: auth.apply(this),
     organization: organization.apply(this),
-    project: organization.apply(this),
-    messageTemplate: messageTemplate.apply(this),
-    invitation: invitation.apply(this)
+    project: project.apply(this),
+    app: app.apply(this),
+    device: device.apply(this)
   }
 }

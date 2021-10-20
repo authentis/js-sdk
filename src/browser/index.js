@@ -6,30 +6,39 @@ export function createRequest(params) {
   const requestOpts = {
     method: params.method,
     credentials: 'same-origin',
-    mode: 'cors'
+    mode: 'cors',
+    headers: self.createHeaders.call(self, params)
   }
 
-  const contentTypeHeader = mayHaveBody ? {'Content-Type': 'application/json'} : {}
-  const authHeader = self.config.token ? {'Authorization': 'Bearer ' + self.config.token} : {}
-  const initialHeaders = Object.assign({}, {
-    'Accept': 'application/json',
-    'Cache-Control': 'no-cache',
-    'Pragma': 'no-cache'
-  }, contentTypeHeader, authHeader)
-  const headers = Object.assign({}, initialHeaders, params.headers || {})
-  requestOpts.headers = headers
+  return async function req(opts={}) {
+    const url = new URL(params.path, self.config.host)
 
-  return async function req(arg1=null, arg2=null) {
-    const pathSuffix = !mayHaveBody && arg1 ? '/' + arg1 : mayHaveBody && arg2 ? '/' + arg1 : ''
-    const fullpath = self.config.host + params.path + pathSuffix
-    const payload = arg2 ? arg2 : arg1 && mayHaveBody ? arg1 : null
+    if (opts.path && Array.isArray(opts.path)) {
+      url.pathname += '/' + opts.path.join('/')
+    }
 
-    if (mayHaveBody && payload) {
-      requestOpts.body = JSON.stringify(payload)
+    if (opts.searchParams) {
+      Object.keys(opts.searchParams).map(param => url.searchParams.set(param, opts.searchParams[param]))
+    }
+
+    if (opts.id) {
+      if (/[^a-zA-Z0-9-]+/.test(opts.id)) {
+        return {error: {code: 'REQUEST_ERROR', details: 'Invalid identifier.'}}
+      }
+      url.pathname = params.path + '/' + opts.id
+    }
+
+    if (opts.body) {
+      if (Object.prototype.toString.call(opts.body) === '[object Object]') {
+        requestOpts.body = JSON.stringify(opts.body)
+      }
+      else {
+        requestOpts.body = opts.body
+      }
     }
 
     try {
-      const resp = await fetch(fullpath, requestOpts)
+      const resp = await fetch(url, requestOpts)
 
       self.setLastResponse.call(self, resp)
 
