@@ -1,14 +1,24 @@
 {
   "name": "@authentis/js-sdk",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Authentis javascript client.",
   "exports": {
-    ".": "./src/index.js",
-    "./browser/es": "./dist/browser/es/index.js",
-    "./browser/cjs": "./dist/browser/cjs/index.js",
-    "./browser/iife": "./dist/browser/iife/index.js",
-    "./node/es": "./dist/node/es/index.js",
-    "./node/cjs": "./dist/node/cjs/index.js"
+    ".": {
+      "node": {
+        "import": "./dist/node/es/index.js",
+        "require": "./dist/node/cjs/index.js"
+      },
+      "import": "./dist/browser/es/index.js",
+      "require": "./dist/browser/cjs/index.js"
+    },
+    "./browser": {
+      "import": "./dist/browser/es/index.js",
+      "require": "./dist/browser/cjs/index.js"
+    },
+    "./node": {
+      "import": "./dist/node/es/index.js",
+      "require": "./dist/node/cjs/index.js"
+    }
   },
   "main": "dist/node/cjs/index.js",
   "scripts": {

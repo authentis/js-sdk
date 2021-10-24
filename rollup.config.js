@@ -10,7 +10,7 @@ plugins.push(['@babel/plugin-transform-runtime', {
   corejs: {version: 3, proposals: true},
   helpers: true,
   regenerator: true,
-  absoluteRuntime: true
+  absoluteRuntime: false
 }])
 
 module.exports = [
@@ -20,16 +20,18 @@ module.exports = [
     output: [
       {
         format: 'cjs',
-        file: 'dist/browser/cjs/index.js'
+        file: 'dist/browser/cjs/index.js',
+        sourcemap: true
       },
       {
         format: 'es',
-        file: 'dist/browser/es/index.js'
+        file: 'dist/browser/es/index.js',
+        sourcemap: true
       }
     ],
     plugins: [
-      nodeResolve(),
-      commonjs({sourceMap: false}),
+      nodeResolve({preferBuiltins: false}),
+      commonjs({sourceMap: true}),
       babel({
         babelHelpers: 'runtime',
         babelrc: false,
@@ -51,12 +53,13 @@ module.exports = [
       {
         format: 'iife',
         name: 'Authentis',
-        file: 'dist/browser/iife/index.js'
+        file: 'dist/browser/iife/index.js',
+        sourcemap: true
       }
     ],
     plugins: [
-      nodeResolve(),
-      commonjs({sourceMap: false}),
+      nodeResolve({preferBuiltins: false}),
+      commonjs({sourceMap: true}),
       babel({
         babelHelpers: 'runtime',
         babelrc: false,
@@ -78,17 +81,18 @@ module.exports = [
     output: [
       {
         format: 'cjs',
-        file: 'dist/node/cjs/index.js'
+        file: 'dist/node/cjs/index.js',
+        sourcemap: true
       },
       {
         format: 'es',
-        file: 'dist/node/es/index.js'
+        file: 'dist/node/es/index.js',
+        sourcemap: true
       }
     ],
     plugins: [
-      nodeResolve(),
-      commonjs({sourceMap: false}),
-      terser()
+      nodeResolve({preferBuiltins: true}),
+      commonjs({sourceMap: true})
     ]
   }
 ]

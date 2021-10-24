@@ -1,1 +1,314 @@
-"use strict";function t(t){return t&&"object"==typeof t&&"default"in t?t:{default:t}}Object.defineProperty(exports,"__esModule",{value:!0});var e=t(require("https"));function a(){return{handshake:this.createRequest.call(this,{method:"PUT",path:"/captcha"}),verify:this.createRequest.call(this,{method:"POST",path:"/captcha"})}}function s(){return{state:this.createRequest.call(this,{method:"GET",path:"/auth/state"}),session:this.createRequest.call(this,{method:"POST",path:"/auth/session"}),epwd:this.createRequest.call(this,{method:"POST",path:"/auth/signin/epwd"}),epwdv:this.createRequest.call(this,{method:"PUT",path:"/auth/signin/epwd"}),eotp:this.createRequest.call(this,{method:"POST",path:"/auth/signin/eotp"}),eotpv:this.createRequest.call(this,{method:"PUT",path:"/auth/signin/eotp"}),potp:this.createRequest.call(this,{method:"POST",path:"/auth/signin/potp"}),potpv:this.createRequest.call(this,{method:"PUT",path:"/auth/signin/potp"}),revoke:this.createRequest.call(this,{method:"DELETE",path:"/auth/revoke"})}}function i(){return{create:this.createRequest.call(this,{method:"POST",path:"/org"}),update:this.createRequest.call(this,{method:"PUT",path:"/org"}),get:this.createRequest.call(this,{method:"GET",path:"/org"}),remove:this.createRequest.call(this,{method:"DELETE",path:"/org"})}}function o(){return{create:this.createRequest.call(this,{method:"POST",path:"/project"}),update:this.createRequest.call(this,{method:"PUT",path:"/project"}),get:this.createRequest.call(this,{method:"GET",path:"/project"}),remove:this.createRequest.call(this,{method:"DELETE",path:"/project"}),signinMethod:{create:this.createRequest.call(this,{method:"POST",path:"/project/signin-method"}),update:this.createRequest.call(this,{method:"PUT",path:"/project/signin-method"}),get:this.createRequest.call(this,{method:"GET",path:"/project/signin-method"}),remove:this.createRequest.call(this,{method:"DELETE",path:"/project/signin-method"})}}}function h(){return{create:this.createRequest.call(this,{method:"POST",path:"/app"}),update:this.createRequest.call(this,{method:"PUT",path:"/app"}),get:this.createRequest.call(this,{method:"GET",path:"/app"}),remove:this.createRequest.call(this,{method:"DELETE",path:"/app"})}}function n(){return{inspect:this.createRequest.call(this,{method:"PUT",path:"/device"})}}function c(t){return this.config={host:t.host||"https://auth.gozel.com.tr",version:t.version||null,projectIdentifier:t.projectIdentifier||"",projectLocale:t.locale||"",token:t.token||null,clientId:t.clientId||null,clientSecret:t.clientSecret||null},this.setLastResponse=function(t){this.lastResponse=t},this.getLastResponse=function(){return this.lastResponse},this.createAuthHeader=function(t){return t.token?"Bearer "+t.token:t.clientId&&t.clientSecret?"Basic "+btoa(t.clientId+":"+t.clientSecret):""},this.createHeaders=function(t){return Object.assign({},{Accept:"application/json","Cache-Control":"no-cache",Pragma:"no-cache"},-1!==["POST","PUT"].indexOf(t.method)?{"Content-Type":"application/json"}:{},{Authorization:this.createAuthHeader(this.config)},this.config.projectIdentifier?{"Authentis-Project-Identifier":this.config.projectIdentifier}:{},this.config.projectLocale?{"Authentis-Project-Locale":this.config.projectLocale}:{})},{getLastResponse:this.getLastResponse.bind(this),captcha:a.apply(this),auth:s.apply(this),organization:i.apply(this),project:o.apply(this),app:h.apply(this),device:n.apply(this)}}function r(t){const a=this;["POST","PUT"].indexOf(t.method);const s={method:t.method,headers:a.createHeaders.call(a,t)};return async function(i={}){return new Promise((function(o,h){let n=null;const c=new URL(t.path,a.config.host);if(i.path&&Array.isArray(i.path)&&(c.pathname+="/"+i.path.join("/")),i.searchParams&&Object.keys(i.searchParams).map((t=>c.searchParams.set(t,i.searchParams[t]))),i.id){if(/[^a-zA-Z0-9-]+/.test(i.id))return{error:{code:"REQUEST_ERROR",details:"Invalid identifier."}};c.pathname=t.path+"/"+i.id}i.body&&(n="[object Object]"===Object.prototype.toString.call(i.body)?JSON.stringify(i.body):i.body,s.headers["Content-Length"]=Buffer.byteLength(n,"utf8"));const r=e.default.request(c,s);r.on("socket",(function(t){t.setTimeout(5e3),t.on("timeout",(function(){r.abort()}))})),r.on("abort",(function(t){return o({error:{code:"REQUEST_ABORTED"}})})),r.on("error",(function(t){return o({error:{code:"REQUEST_ERROR"}})})),r.on("response",(function(t){let e=[],s=0;t.on("data",(function(t){e.push(t),s+=t.length})),t.on("close",(function(){return o({error:{code:"REQUEST_ERROR"}})})),t.on("end",(function(){e=Buffer.concat(e,s).toString().trim(),a.setLastResponse.call(a,t);try{return e=JSON.parse(e),e}catch(t){return{error:{code:"REQUEST_ERROR"}}}}))})),r.end(n)}))}}exports.configure=function(t={}){return c.call({createRequest:r},t)};
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var http = require('https');
+
+function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+var http__default = /*#__PURE__*/_interopDefaultLegacy(http);
+
+function captcha() {
+  return {
+    handshake: this.createRequest.call(this, {
+      method: 'PUT',
+      path: '/captcha'
+    }),
+    verify: this.createRequest.call(this, {
+      method: 'POST',
+      path: '/captcha'
+    })
+  }
+}
+
+function auth() {
+  return {
+    state: this.createRequest.call(this, {
+      method: 'GET',
+      path: '/auth/state'
+    }),
+    session: this.createRequest.call(this, {
+      method: 'POST',
+      path: '/auth/session'
+    }),
+    epwd: this.createRequest.call(this, {
+      method: 'POST',
+      path: '/auth/signin/epwd'
+    }),
+    epwdv: this.createRequest.call(this, {
+      method: 'PUT',
+      path: '/auth/signin/epwd'
+    }),
+    eotp: this.createRequest.call(this, {
+      method: 'POST',
+      path: '/auth/signin/eotp'
+    }),
+    eotpv: this.createRequest.call(this, {
+      method: 'PUT',
+      path: '/auth/signin/eotp'
+    }),
+    potp: this.createRequest.call(this, {
+      method: 'POST',
+      path: '/auth/signin/potp'
+    }),
+    potpv: this.createRequest.call(this, {
+      method: 'PUT',
+      path: '/auth/signin/potp'
+    }),
+    revoke: this.createRequest.call(this, {
+      method: 'DELETE',
+      path: '/auth/revoke'
+    })
+  }
+}
+
+function organization() {
+  return {
+    create: this.createRequest.call(this, {
+      method: 'POST',
+      path: '/org'
+    }),
+    update: this.createRequest.call(this, {
+      method: 'PUT',
+      path: '/org'
+    }),
+    get: this.createRequest.call(this, {
+      method: 'GET',
+      path: '/org'
+    }),
+    remove: this.createRequest.call(this, {
+      method: 'DELETE',
+      path: '/org'
+    })
+  }
+}
+
+function project() {
+  return {
+    create: this.createRequest.call(this, {
+      method: 'POST',
+      path: '/project'
+    }),
+    update: this.createRequest.call(this, {
+      method: 'PUT',
+      path: '/project'
+    }),
+    get: this.createRequest.call(this, {
+      method: 'GET',
+      path: '/project'
+    }),
+    remove: this.createRequest.call(this, {
+      method: 'DELETE',
+      path: '/project'
+    }),
+    signinMethod: {
+      create: this.createRequest.call(this, {
+        method: 'POST',
+        path: '/project/signin-method'
+      }),
+      update: this.createRequest.call(this, {
+        method: 'PUT',
+        path: '/project/signin-method'
+      }),
+      get: this.createRequest.call(this, {
+        method: 'GET',
+        path: '/project/signin-method'
+      }),
+      remove: this.createRequest.call(this, {
+        method: 'DELETE',
+        path: '/project/signin-method'
+      })
+    }
+  }
+}
+
+function app() {
+  return {
+    create: this.createRequest.call(this, {
+      method: 'POST',
+      path: '/app'
+    }),
+    update: this.createRequest.call(this, {
+      method: 'PUT',
+      path: '/app'
+    }),
+    get: this.createRequest.call(this, {
+      method: 'GET',
+      path: '/app'
+    }),
+    remove: this.createRequest.call(this, {
+      method: 'DELETE',
+      path: '/app'
+    })
+  }
+}
+
+function device() {
+  return {
+    inspect: this.createRequest.call(this, {
+      method: 'PUT',
+      path: '/device'
+    })
+  }
+}
+
+function Authentis(userConfig) {
+  this.config = {
+    host: userConfig.host || 'https://auth.gozel.com.tr',
+    version: userConfig.version || null,
+    projectIdentifier: userConfig.projectIdentifier || '',
+    projectLocale: userConfig.locale || '',
+    token: userConfig.token || null,
+    clientId: userConfig.clientId || null,
+    clientSecret: userConfig.clientSecret || null
+  };
+
+  this.setLastResponse = function(resp) {
+    this.lastResponse = resp;
+  };
+  this.getLastResponse = function() {
+    return this.lastResponse
+  };
+
+  this.createAuthHeader = function createAuthHeader(obj) {
+    if (obj.token) {
+      return 'Bearer ' + obj.token
+    }
+    else if (obj.clientId && obj.clientSecret) {
+      return 'Basic ' + btoa(obj.clientId + ':' + obj.clientSecret)
+    }
+    else {
+      return ''
+    }
+  };
+
+  this.createHeaders = function createHeaders(obj) {
+    return Object.assign({},
+      {
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+      },
+      ['POST', 'PUT'].indexOf(obj.method) !== -1
+        ? {'Content-Type': 'application/json'}
+        : {},
+      {'Authorization': this.createAuthHeader(this.config)},
+      this.config.projectIdentifier
+        ? {'Authentis-Project-Identifier': this.config.projectIdentifier}
+        : {},
+      this.config.projectLocale
+        ? {'Authentis-Project-Locale': this.config.projectLocale}
+        : {}
+    )
+  };
+
+  return {
+    getLastResponse: this.getLastResponse.bind(this),
+    captcha: captcha.apply(this),
+    auth: auth.apply(this),
+    organization: organization.apply(this),
+    project: project.apply(this),
+    app: app.apply(this),
+    device: device.apply(this)
+  }
+}
+
+/*
+function getUserAgent() {
+  return 'Authentis/SDK/' + pkg.version + ' Node.js/' + process.versions.node
+}
+*/
+function createRequest(params) {
+  const self = this;
+  ['POST', 'PUT'].indexOf(params.method) !== -1;
+  const requestOpts = {
+    method: params.method,
+    headers: self.createHeaders.call(self, params)
+  };
+
+  return async function req(opts={}) {
+    return new Promise(function(resolve, reject) {
+      let body = null;
+      const url = new URL(params.path, self.config.host);
+
+      if (opts.path && Array.isArray(opts.path)) {
+        url.pathname += '/' + opts.path.join('/');
+      }
+
+      if (opts.searchParams) {
+        Object.keys(opts.searchParams).map(param => url.searchParams.set(param, opts.searchParams[param]));
+      }
+
+      if (opts.id) {
+        if (/[^a-zA-Z0-9-]+/.test(opts.id)) {
+          return {error: {code: 'REQUEST_ERROR', details: 'Invalid identifier.'}}
+        }
+        url.pathname = params.path + '/' + opts.id;
+      }
+
+      if (opts.body) {
+        if (Object.prototype.toString.call(opts.body) === '[object Object]') {
+          body = JSON.stringify(opts.body);
+        }
+        else {
+          body = opts.body;
+        }
+
+        requestOpts.headers['Content-Length'] = Buffer.byteLength(body, 'utf8');
+      }
+
+      const request = http__default["default"].request(url, requestOpts);
+
+      request.on('socket', function(socket) {
+        socket.setTimeout(5000);
+        socket.on('timeout', function() {
+          request.abort();
+        });
+      });
+
+      request.on('abort', function(e) {
+        return resolve({error: {code: 'REQUEST_ABORTED'}})
+      });
+
+      request.on('error', function(e) {
+        return resolve({error: {code: 'REQUEST_ERROR'}})
+      });
+
+      request.on('response', function(response) {
+        let data=[], size=0;
+
+        response.on('data', function(chunk) {
+          data.push(chunk);
+          size += chunk.length;
+        });
+
+        response.on('close', function() {
+          return resolve({error: {code: 'REQUEST_ERROR'}})
+        });
+
+        response.on('end', function() {
+          data = Buffer.concat(data, size).toString().trim();
+
+          self.setLastResponse.call(self, response);
+
+          try {
+            data = JSON.parse(data);
+
+            return data
+          } catch (e) {
+            return {error: {code: 'REQUEST_ERROR'}}
+          }
+        });
+      });
+
+      request.end(body);
+    })
+  }
+}
+
+function configure(userConfig={}) {
+  return Authentis.call({createRequest}, userConfig)
+}
+
+exports.configure = configure;
+//# sourceMappingURL=index.js.map
