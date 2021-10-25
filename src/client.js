@@ -168,6 +168,12 @@ function subject() {
   }
 }
 
+function configure() {
+  return function(userConfig) {
+    this.config = Object.assign({}, this.config, userConfig)
+  }
+}
+
 export default function Authentis(userConfig) {
   this.config = {
     host: userConfig.host || 'https://auth.gozel.com.tr',
@@ -219,6 +225,7 @@ export default function Authentis(userConfig) {
   }
 
   return {
+    configure: configure.apply(this),
     getLastResponse: this.getLastResponse.bind(this),
     captcha: captcha.apply(this),
     auth: auth.apply(this),
