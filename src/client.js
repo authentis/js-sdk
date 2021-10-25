@@ -159,6 +159,15 @@ function device() {
   }
 }
 
+function subject() {
+  return {
+    signinMethod: this.createRequest.call(this, {
+      method: 'GET',
+      path: '/subject/signin-method'
+    })
+  }
+}
+
 export default function Authentis(userConfig) {
   this.config = {
     host: userConfig.host || 'https://auth.gozel.com.tr',
@@ -216,6 +225,7 @@ export default function Authentis(userConfig) {
     organization: organization.apply(this),
     project: project.apply(this),
     app: app.apply(this),
-    device: device.apply(this)
+    device: device.apply(this),
+    subject: subject.apply(this)
   }
 }
