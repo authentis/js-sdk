@@ -1,6 +1,6 @@
 {
   "name": "@authentis/js-sdk",
-  "version": "null",
+  "version": "0.5.0",
   "description": "Authentis javascript client.",
   "exports": {
     ".": {
