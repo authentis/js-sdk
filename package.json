@@ -1,6 +1,6 @@
 {
   "name": "@authentis/js-sdk",
-  "version": "0.4.0",
+  "version": "null",
   "description": "Authentis javascript client.",
   "exports": {
     ".": {
@@ -18,6 +18,10 @@
     "./node": {
       "import": "./dist/node/es/index.js",
       "require": "./dist/node/cjs/index.js"
+    },
+    "./node/http": {
+      "import": "./dist/nodehttp/es/index.js",
+      "require": "./dist/nodehttp/cjs/index.js"
     }
   },
   "main": "dist/node/cjs/index.js",

@@ -94,5 +94,24 @@ module.exports = [
       nodeResolve({preferBuiltins: true}),
       commonjs({sourceMap: true})
     ]
+  },
+  {
+    input: 'src/nodehttp/index.js',
+    output: [
+      {
+        format: 'cjs',
+        file: 'dist/nodehttp/cjs/index.js',
+        sourcemap: true
+      },
+      {
+        format: 'es',
+        file: 'dist/nodehttp/es/index.js',
+        sourcemap: true
+      }
+    ],
+    plugins: [
+      nodeResolve({preferBuiltins: true}),
+      commonjs({sourceMap: true})
+    ]
   }
 ]
