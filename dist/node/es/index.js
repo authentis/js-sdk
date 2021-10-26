@@ -291,7 +291,7 @@ function createRequest(params) {
       });
 
       request.on('error', function(e) {
-        return resolve({error: {code: 'REQUEST_ERROR'}})
+        return resolve({error: {code: 'REQUEST_ERROR', details: e}})
       });
 
       request.on('response', function(response) {
@@ -303,7 +303,7 @@ function createRequest(params) {
         });
 
         response.on('close', function() {
-          return resolve({error: {code: 'REQUEST_ERROR'}})
+          return resolve({error: {code: 'REQUEST_ERROR', details: e}})
         });
 
         response.on('end', function() {
@@ -316,7 +316,7 @@ function createRequest(params) {
 
             return data
           } catch (e) {
-            return {error: {code: 'REQUEST_ERROR'}}
+            return {error: {code: 'REQUEST_ERROR', details: e}}
           }
         });
       });
