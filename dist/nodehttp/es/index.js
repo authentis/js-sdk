@@ -156,13 +156,13 @@ function subject() {
 function configure$1() {
   return function(userConfig) {
     this.config = Object.assign({}, this.config, userConfig);
-  }
+  }.bind(this)
 }
 
 function getConfig() {
   return function() {
     return this.config
-  }
+  }.bind(this)
 }
 
 function Authentis(userConfig) {
