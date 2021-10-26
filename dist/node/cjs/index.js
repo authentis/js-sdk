@@ -167,9 +167,15 @@ function configure$1() {
   }
 }
 
+function getConfig() {
+  return function() {
+    return this.config
+  }
+}
+
 function Authentis(userConfig) {
   this.config = {
-    host: userConfig.host || 'https://auth.gozel.com.tr',
+    host: userConfig.host,
     version: userConfig.version || null,
     projectIdentifier: userConfig.projectIdentifier || '',
     projectLocale: userConfig.locale || '',
@@ -177,6 +183,10 @@ function Authentis(userConfig) {
     clientId: userConfig.clientId || null,
     clientSecret: userConfig.clientSecret || null
   };
+
+  if (!this.config.host) {
+    throw new Error('Missing option "host".')
+  }
 
   this.setLastResponse = function(resp) {
     this.lastResponse = resp;
@@ -219,6 +229,7 @@ function Authentis(userConfig) {
 
   return {
     configure: configure$1.apply(this),
+    getConfig: getConfig.apply(this),
     getLastResponse: this.getLastResponse.bind(this),
     captcha: captcha.apply(this),
     auth: auth.apply(this),
